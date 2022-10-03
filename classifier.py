@@ -1,13 +1,8 @@
 import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
-import seaborn as sns
 import sklearn
 import torch
 import sqlite3
 import torch.nn as nn
-import torch.nn.functional as F
-import torch.optim as optim
 
 #load train and test datasets
 data_path = 'musicData.db'
@@ -18,41 +13,91 @@ test = pd.read_sql_query("SELECT * FROM test", conn)
 conn.close()
 print("Finish Loading")
 
-print(train.dtypes)
+#ranom forest
+X_train = train.drop(['music_genre'], axis=1)
+y_train = train['music_genre']
+X_test = test.drop(['music_genre'], axis=1)
+y_test = test['music_genre']
 
-#Neural Network
-class Net(nn.Module):
-    def __init__(self):
-        super(Net, self).__init__()
-        self.fc1 = nn.Linear(11, 64)
-        self.fc2 = nn.Linear(64, 64)
-        self.fc3 = nn.Linear(64, 10)
+class FeedForwardNN(nn.Module):
+    def __init__(self, input_size, hidden_size, num_classes):
+        super(FeedForwardNN, self).__init__()
+        self.fc1 = nn.Linear(input_size, hidden_size)
+        self.relu = nn.ReLU()
+        self.fc2 = nn.Linear(hidden_size, num_classes)
+
     def forward(self, x):
-        x = F.relu(self.fc1(x))
-        x = F.relu(self.fc2(x))
-        x = self.fc3(x)
-        return F.log_softmax(x, dim=1)
+        out = self.fc1(x)
+        out = self.relu(out)
+        out = self.fc2(out)
+        return out
 
-model = Net()
+# Neural Network parameters
+input_size = 4
+hidden_size = 100
+num_classes = 10
+num_epochs = 1000
+batch_size = 100
+learning_rate = 0.001
+
+# Device configuration
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+
+# Data loader
+train = torch.utils.data.TensorDataset(torch.from_numpy(X_train.values).float(), torch.from_numpy(y_train.values).long())
+test = torch.utils.data.TensorDataset(torch.from_numpy(X_test.values).float(), torch.from_numpy(y_test.values).long())
+train_loader = torch.utils.data.DataLoader(dataset=train, batch_size=batch_size, shuffle=True)
+test_loader = torch.utils.data.DataLoader(dataset=test, batch_size=batch_size, shuffle=False)
+
+# Neural network
+model = FeedForwardNN(input_size, hidden_size, num_classes).to(device)
+
+# Loss and optimizer
 criterion = nn.CrossEntropyLoss()
-optimizer = optim.Adam(model.parameters(), lr=0.001)
+optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
 
-EPOCHS = 100
-for epoch in range(EPOCHS):
-    optimizer.zero_grad()
-    output = model(train_x)
-    loss = criterion(output, train_y)
-    loss.backward()
-    optimizer.step()
-    if (epoch+1)%10 == 0:
-        print("Epoch: ", epoch+1, "Loss: ", loss.item())
+# Train the model
+total_step = len(train_loader)
+for epoch in range(num_epochs):
+    for i, (features, labels) in enumerate(train_loader):
+        # Move tensors to the configured device
+        features = features.to(device)
+        labels = labels.to(device)
 
-#test
-y_pred = model(test_x)
-y_pred = y_pred.detach().numpy()
-y_pred = np.argmax(y_pred, axis=1)
-print("Accuracy: ", sklearn.metrics.accuracy_score(test_y, y_pred))
+        # Forward pass
+        outputs = model(features)
+        loss = criterion(outputs, labels)
 
+        # Backward and optimize
+        optimizer.zero_grad()
+        loss.backward()
+        optimizer.step()
 
+        if (i + 1) % 100 == 0:
+            print('Epoch [{}/{}], Step [{}/{}], Loss: {:.4f}'
+                  .format(epoch + 1, num_epochs, i + 1, total_step, loss.item()))
+
+    # Test the model
+    with torch.no_grad():
+        correct = 0
+        total = 0
+        for features, labels in test_loader:
+            features = features.to(device)
+            labels = labels.to(device)
+            outputs = model(features)
+            _, predicted = torch.max(outputs.data, 1)
+            total += labels.size(0)
+            correct += (predicted == labels).sum().item()
+
+        print('Test Accuracy of the model on the 10000 test images: {} %'.format(100 * correct / total))
+
+    # Save the model checkpoint
+    torch.save(model.state_dict(), 'model.ckpt')
+
+#close device
+print("Finish training")
+predicted = model(torch.from_numpy(X_test.values).float())
+_, predicted = torch.max(predicted.data, 1)
+print("Accuracy: ", sklearn.metrics.accuracy_score(y_test, predicted))
 
 
