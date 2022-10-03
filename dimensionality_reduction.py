@@ -11,18 +11,29 @@ df = pd.read_sql_query("SELECT * FROM musicData", conn)
 conn.close()
 print("Finish Loading")
 
-#extract categorical data
-categorical = df.drop(['music_genre'], axis=1)
-categorical = categorical.drop(['mode'], axis=1)
+#extract cartagorical data
+dropped_df = df.drop(['music_genre'], axis=1)
+dropped_df = dropped_df.drop(['mode'], axis=1)
 
-#dimensionality reduction
+#PCA
 pca = PCA(n_components=3)
-pca.fit(categorical)
-transformed = pca.transform(categorical)
-plt = px.scatter_3d(transformed, x=0, y=1, z=2, color=df['music_genre'])
-plt.show()
+pca.fit(dropped_df)
+pca_result = pca.transform(dropped_df)
+pca_result = pd.DataFrame(pca_result, columns=['pca1', 'pca2', 'pca3'])
+pca_result['mode'] = df['mode']
+pca_result['music_genre'] = df['music_genre']
 
-plt = px.scatter(transformed, x=0, y=1, color=df['music_genre'])
-plt.show()
-print('finish')
+
+#plot
+fig = px.scatter_3d(pca_result, x='pca1', y='pca2', z='pca3', color='music_genre')
+fig.show()
+
+#to sql
+conn = sqlite3.connect('musicData.db')
+c = conn.cursor()
+pca_result.to_sql('pca_result', conn, if_exists='replace', index = False)
+conn.commit()
+conn.close()
+
+print('Finish updating pca_result datasets.')
 
