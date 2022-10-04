@@ -3,8 +3,9 @@ import sklearn
 import torch
 import sqlite3
 import torch.nn as nn
+from sklearn import metrics
 
-#load train and test datasets
+# load train and test datasets
 data_path = 'musicData.db'
 conn = sqlite3.connect(data_path)
 c = conn.cursor()
@@ -13,11 +14,12 @@ test = pd.read_sql_query("SELECT * FROM test", conn)
 conn.close()
 print("Finish Loading")
 
-#ranom forest
+# ranom forest
 X_train = train.drop(['music_genre'], axis=1)
 y_train = train['music_genre']
 X_test = test.drop(['music_genre'], axis=1)
 y_test = test['music_genre']
+
 
 class FeedForwardNN(nn.Module):
     def __init__(self, input_size, hidden_size, num_classes):
@@ -98,6 +100,6 @@ for epoch in range(num_epochs):
 print("Finish training")
 predicted = model(torch.from_numpy(X_test.values).float())
 _, predicted = torch.max(predicted.data, 1)
-print("Accuracy: ", sklearn.metrics.accuracy_score(y_test, predicted))
+print("Accuracy: ", metrics.accuracy_score(y_test, predicted))
 
 
