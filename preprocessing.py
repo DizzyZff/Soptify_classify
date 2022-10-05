@@ -62,3 +62,6 @@ c = conn.cursor()
 df.to_sql('musicData_clean', conn, if_exists='replace', index=False)
 conn.commit()
 conn.close()
+
+# to csv
+df.to_csv('musicData_clean.csv', index=False)
