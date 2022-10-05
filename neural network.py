@@ -4,6 +4,7 @@ import plotly.express as px
 import torch
 from sklearn import metrics
 
+
 data_path = 'musicData.db'
 conn = sqlite3.connect(data_path)
 c = conn.cursor()
@@ -18,35 +19,29 @@ y_train = y_train.astype('int')
 X_test = test.drop(['music_genre'], axis=1)
 y_test = test['music_genre']
 y_test = y_test.astype('int')
+# ,'mode_Major','mode_Minor'
 
-
-class nn(torch.nn.Module):
-    def __init__(self, input_size, hidden_size, output_size):
-        super(nn, self).__init__()
-        self.linear1 = torch.nn.Linear(input_size, hidden_size)
-        self.linear2 = torch.nn.Linear(hidden_size, output_size)
+# multiclass classification neural network
+class NeuralNet(torch.nn.Module):
+    def __init__(self, input_size, hidden_size, num_classes):
+        super(NeuralNet, self).__init__()
+        self.fc1 = torch.nn.Linear(input_size, hidden_size)
         self.relu = torch.nn.ReLU()
-        self.softmax = torch.nn.Softmax(dim=1)
+        self.fc2 = torch.nn.Linear(hidden_size, num_classes)
 
     def forward(self, x):
-        x = self.linear1(x)
-        x = self.relu(x)
-        x = self.linear2(x)
-        x = self.softmax(x)
-        return x
+        out = self.fc1(x)
+        out = self.relu(out)
+        out = self.fc2(out)
+        return out
 
 
-input_size = 5
-hidden_size = 100
-output_size = 10
+input_size = 9
+hidden_size = 300
+num_classes = 10
 
-params = {
-    'input_size': input_size,
-    'hidden_size': hidden_size,
-    'output_size': output_size
-}
+model = NeuralNet(input_size, hidden_size, num_classes)
 
-model = nn(**params)
 criterion = torch.nn.CrossEntropyLoss()
 optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
 
@@ -54,23 +49,61 @@ X_train = torch.from_numpy(X_train.values).float()
 y_train = torch.from_numpy(y_train.values).long()
 X_test = torch.from_numpy(X_test.values).float()
 y_test = torch.from_numpy(y_test.values).long()
+train = torch.utils.data.TensorDataset(X_train, y_train)
 
-epochs = 2000
+device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+model.to(device)
 
-for epoch in range(epochs):
+accuracy_list = []
+for epoch in range(3000):
+    inputs = X_train.to(device)
+    labels = y_train.to(device)
+
+    outputs = model(inputs)
+    loss = criterion(outputs, labels)
+
     optimizer.zero_grad()
-    y_pred = model(X_train)
-    loss = criterion(y_pred, y_train)
     loss.backward()
     optimizer.step()
-    if epoch % 100 == 0:
-        print('Epoch: ', epoch, 'Loss: ', loss.item())
 
+    if (epoch + 1) % 100 == 0:
+        print('Epoch [{}/{}], Loss: {:.4f}'
+              .format(epoch + 1, 1000, loss.item()))
+
+    if (epoch + 1) % 10 == 0:
+        # acc on genre 1
+        correct = 0
+        total = 0
+        with torch.no_grad():
+            inputs = X_test.to(device)
+            labels = y_test.to(device)
+            outputs = model(inputs)
+            _, predicted = torch.max(outputs.data, 1)
+            total += labels.size(0)
+            correct += (predicted == labels).sum().item()
+        accuracy = 100 * correct / total
+        accuracy_list.append(accuracy)
+        print('Accuracy of the network on the test images: {} %'.format(accuracy))
+
+# plot accuracy
+fig = px.line(x=range(0,3000,10), y=accuracy_list)
+fig.show()
+
+# confusion matrix
 with torch.no_grad():
-    y_pred = model(X_test)
-    y_pred = torch.argmax(y_pred, dim=1)
-    print('Accuracy: ', metrics.accuracy_score(y_test, y_pred))
+    inputs = X_test.to(device)
+    labels = y_test.to(device)
+    outputs = model(inputs)
+    _, predicted = torch.max(outputs.data, 1)
+    print(metrics.confusion_matrix(labels.cpu(), predicted.cpu()))
 
-# # Test the model
+# save model
+torch.save(model.state_dict(), 'model.ckpt')
 
-model.eval()
+
+
+
+
+
+
+

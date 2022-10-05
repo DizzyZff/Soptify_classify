@@ -49,11 +49,11 @@ print(definitions)
 # TEMPO to numeric
 df['tempo'] = df['tempo'].astype(float)
 
-df = df.drop(['artist_name'], axis=1)
+"""df = df.drop(['artist_name'], axis=1)
 df = df.drop(['track_name'], axis=1)
-"""df = df.drop(['instance_id'], axis=1)
-df = df.drop(['obtained_date'], axis=1)
-""""""
+df = df.drop(['instance_id'], axis=1)
+df = df.drop(['obtained_date'], axis=1)"""
+"""
 df = df.drop(['artist_name_length'], axis=1)
 df = df.drop(['track_name_length'], axis=1)"""
 
