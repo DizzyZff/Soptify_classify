@@ -58,6 +58,7 @@ pca_result['popularity'] = df['popularity']
 pca_result['music_genre'] = pca_result['music_genre'].astype('category')
 
 
+
 # plot
 fig = px.scatter_3d(pca_result, x='pca1', y='pca2', z='pca3', color='music_genre')
 background_color = 'rgb(234, 230, 222)'

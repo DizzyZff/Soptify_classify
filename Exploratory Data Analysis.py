@@ -6,8 +6,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 # load from db
-from sklearn import datasets
-from sklearn.decomposition import PCA
 
 data_path = 'musicData.db'
 conn = sqlite3.connect(data_path)
@@ -16,16 +14,9 @@ df = pd.read_sql_query("SELECT * FROM musicData_clean", conn)
 conn.close()
 print("Finish Loading")
 
-cat_df = df[['mode', 'music_genre', 'key']]
-num_df = df.drop(['mode', 'music_genre', 'key'], axis=1)
+cat_df = df['music_genre', 'key', "mode_Major", "mode_Minor"]
+num_df = df.drop(['music_genre', 'key', "mode_Major", "mode_Minor"], axis=1)
 print(cat_df.head(), num_df.head())
-
-"""corr = num_df.corr()
-fig1 = plt.figure(figsize=(15, 10))
-sns.heatmap(corr, annot=True, cmap='GnBu', linewidths=0.5)
-sns.set(font_scale=2)
-plt.show()
-fig1.savefig('heatmap.png', dpi=300)
 
 fig2 = plt.figure(figsize=(30, 30))
 sns.pairplot(num_df, height=5)
@@ -34,7 +25,6 @@ plt.tight_layout()
 plt.show()
 #high quality image
 fig2.savefig('pairplot.png', dpi=300)
-
 
 fig, ax = plt.subplots(len(cat_df.columns), len(cat_df.columns), figsize=(50, 50))
 for i in range(0, len(cat_df.columns)):
@@ -46,9 +36,9 @@ for i in range(0, len(cat_df.columns)):
             chart.set_xticklabels(chart.get_xticklabels(), rotation=45)
 plt.show()
 # high quality image
-fig.savefig('cat_df.png', dpi=300)"""
+fig.savefig('cat_df.png', dpi=300)
 
-# categorical vs numerical/ first 5 columns
+"""# categorical vs numerical/ first 5 columns
 fig3, ax = plt.subplots(len(cat_df.columns), 5, figsize=(50, 50))
 for i in range(0, len(cat_df.columns)):
     cat = cat_df.columns[i]
@@ -85,6 +75,6 @@ for i in range(0, len(cat_df.columns)):
 
 plt.show()
 # high quality image
-fig5.savefig('cat_num3.png', dpi=300)
+fig5.savefig('cat_num3.png', dpi=300)"""
 
 
