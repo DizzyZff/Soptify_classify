@@ -21,9 +21,8 @@ df['tempo'] = df['tempo'].astype(float)
 df['tempo'] = (df['tempo'] - df['tempo'].mean()) / df['tempo'].std()
 df['valence'] = (df['valence'] - df['valence'].mean()) / df['valence'].std()
 df['duration_ms'] = (df['duration_ms'] - df['duration_ms'].mean()) / df['duration_ms'].std()
-"""df['key'] = (df['key'] - df['key'].mean()) / df['key'].std()
+"""df['key'] = (df['key'] - df['key'].mean()) / df['key'].std()"""
 df['popularity'] = (df['popularity'] - df['popularity'].mean()) / df['popularity'].std()
-"""
 # to sql
 conn = sqlite3.connect('musicData.db')
 c = conn.cursor()

@@ -36,14 +36,14 @@ class NeuralNet(torch.nn.Module):
         return out
 
 
-input_size = 14
-hidden_size = 300
+input_size = 12
+hidden_size = 100
 num_classes = 10
 
 model = NeuralNet(input_size, hidden_size, num_classes)
 
 criterion = torch.nn.CrossEntropyLoss()
-optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
+optimizer = torch.optim.Adam(model.parameters(), lr=0.01)
 
 X_train = torch.from_numpy(X_train.values).float()
 y_train = torch.from_numpy(y_train.values).long()
@@ -55,7 +55,7 @@ device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 model.to(device)
 
 accuracy_list = []
-for epoch in range(3000):
+for epoch in range(5000):
     inputs = X_train.to(device)
     labels = y_train.to(device)
 
@@ -86,7 +86,7 @@ for epoch in range(3000):
         print('Accuracy of the network on the test images: {} %'.format(accuracy))
 
 # plot accuracy
-fig = px.line(x=range(0,3000,10), y=accuracy_list)
+fig = px.line(x=range(0,5000,10), y=accuracy_list)
 fig.show()
 
 # confusion matrix

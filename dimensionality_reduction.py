@@ -1,82 +1,75 @@
+import numpy as np
 import pandas as pd
 import sqlite3
+import seaborn as sns
+import matplotlib.pyplot as plt
 from sklearn.decomposition import PCA
 import plotly.express as px
 # load from db
+from sklearn.impute import SimpleImputer
+
 data_path = 'musicData.db'
 conn = sqlite3.connect(data_path)
 c = conn.cursor()
-df = pd.read_sql_query("SELECT * FROM musicData_normal", conn)
+df = pd.read_sql_query("SELECT * FROM musicData_eda", conn)
 conn.close()
 print("Finish Loading")
 
+# impute missing values
+simple_imputer = SimpleImputer(missing_values=np.nan, strategy='mean')
+df['acousticness'] = simple_imputer.fit_transform(df[['acousticness']]).ravel()
+df['danceability'] = simple_imputer.fit_transform(df[['danceability']]).ravel()
+df['energy'] = simple_imputer.fit_transform(df[['energy']]).ravel()
+df['instrumentalness'] = simple_imputer.fit_transform(df[['instrumentalness']]).ravel()
+df['liveness'] = simple_imputer.fit_transform(df[['liveness']]).ravel()
+df['loudness'] = simple_imputer.fit_transform(df[['loudness']]).ravel()
+df['speechiness'] = simple_imputer.fit_transform(df[['speechiness']]).ravel()
+df['tempo'] = simple_imputer.fit_transform(df[['tempo']]).ravel()
+df['valence'] = simple_imputer.fit_transform(df[['valence']]).ravel()
+df['duration_ms'] = simple_imputer.fit_transform(df[['duration_ms']]).ravel()
+df['popularity'] = simple_imputer.fit_transform(df[['popularity']]).ravel()
+
 corr = df.corr()
-"""
-fig1 = px.imshow(corr)
+sns.heatmap(corr, xticklabels=corr.columns, yticklabels=corr.columns, annot=True)
+plt.show()
+corr = corr[abs(corr) > 0.25]
+corr = corr[corr != 1]
+sns.heatmap(corr, xticklabels=corr.columns, yticklabels=corr.columns, annot=True)
+plt.show()
+print(corr)
 
-plt = px.imshow(corr, labels=dict(x="Features", y="Features", color="Correlation"),
-                color_continuous_scale=px.colors.sequential.Cividis_r)
-# colorscale = [[0, 'rgb(84, 84, 84)'], [1, 'rgb(230, 230, 218)']]
-plt.update_layout(
-    plot_bgcolor='rgb(234, 230, 222)',
-    paper_bgcolor='rgb(234, 230, 222)',
-    font_color='rgb(0, 0, 0)',
-    xaxis_showgrid=False,
-    yaxis_showgrid=False,
-    xaxis_zeroline=False,
-    yaxis_zeroline=False,
-    margin=dict(r=20, l=10, b=10, t=10)
-
-plt.show()"""
-#high quality image
-
-print(df.head())
-dropped_df = df.drop(['music_genre'], axis=1)
-dropped_df = dropped_df.drop(['mode_Minor', 'mode_Major'], axis=1)
-dropped_df = dropped_df.drop(['key'], axis=1)
-dropped_df = dropped_df.drop(['popularity'], axis=1)
-"""dropped_df = dropped_df.drop(['liveness'], axis=1)
-dropped_df = dropped_df.drop(['tempo'], axis=1)
-dropped_df = dropped_df.drop(['speechiness'], axis=1)
-dropped_df = dropped_df.drop(['popularity'], axis=1)
-dropped_df = dropped_df.drop(['valence'], axis=1)
-dropped_df = dropped_df.drop(['danceability'], axis=1)"""
-dropped_df = dropped_df.drop(['artist_name','track_name'], axis=1)
-dropped_df = dropped_df.drop(['instance_id'], axis=1)
-dropped_df = dropped_df.drop(['obtained_date'], axis=1)
-new_df = dropped_df[['energy', 'loudness', 'acousticness']]
-print(dropped_df.info())
 # PCA
-pca = PCA(n_components=2)
-pca.fit(new_df)
-pca_result = pca.transform(new_df)
-print(pca.explained_variance_ratio_, "sum:", sum(pca.explained_variance_ratio_))
-pca_result = pd.DataFrame(pca_result, columns=['pca1', 'pca2'])
-df['pca1'] = pca_result['pca1']
-df['pca2'] = pca_result['pca2']
-df = df.drop(['energy', 'loudness', 'acousticness'], axis=1)
-df = df.drop(['artist_name','track_name'], axis=1)
-df = df.drop(['instance_id'], axis=1)
-df = df.drop(['obtained_date'], axis=1)
+pca = PCA(n_components=1)
+pca_df = df[['acousticness', 'energy', 'loudness']]
+pca_result = pca.fit_transform(pca_df)
+print('Explained variation per principal component: {}'.format(pca.explained_variance_ratio_))
+print('sum of explained variation: {}'.format(sum(pca.explained_variance_ratio_)))
 
-conn = sqlite3.connect(data_path)
+pca_result = pd.DataFrame(pca_result, columns=['pca1'])
+pca_result['key'] = df['key']
+pca_result['mode_Major'] = df['mode_Major']
+pca_result['mode_Minor'] = df['mode_Minor']
+pca_result['music_genre'] = df['music_genre']
+pca_result['duration_ms'] = df['duration_ms']
+pca_result['tempo'] = df['tempo']
+pca_result['liveness'] = df['liveness']
+pca_result['speechiness'] = df['speechiness']
+pca_result['valence'] = df['valence']
+pca_result['danceability'] = df['danceability']
+pca_result['instrumentalness'] = df['instrumentalness']
+pca_result['popularity'] = df['popularity']
+
+
+
+conn = sqlite3.connect('musicData.db')
 c = conn.cursor()
-df.to_sql('musicData_pca', conn, if_exists='replace', index=False)
+pca_result.to_sql('musicData_pca', conn, if_exists='replace', index = False)
+conn.commit()
 conn.close()
-print("Finish Saving")
-
-new_df = df.drop(['pca1', 'pca2'], axis=1)
-new_df['energy'] = dropped_df['energy']
-new_df['loudness'] = dropped_df['loudness']
-new_df['acousticness'] = dropped_df['acousticness']
-
-conn = sqlite3.connect(data_path)
-c = conn.cursor()
-new_df.to_sql('musicData_pre', conn, if_exists='replace', index=False)
-conn.close()
-print("Finish Saving")
 
 
-# plot
+
+
+
 
 
