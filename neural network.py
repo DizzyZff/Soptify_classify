@@ -2,8 +2,10 @@ import pandas as pd
 import sqlite3
 import plotly.express as px
 import torch
+import seaborn as sns
+import matplotlib.pyplot as plt
 from sklearn import metrics
-
+sns.set(rc={'axes.facecolor': '#eae6dd', 'figure.facecolor': '#eae6dd'})
 
 data_path = 'musicData.db'
 conn = sqlite3.connect(data_path)
@@ -36,7 +38,7 @@ class NeuralNet(torch.nn.Module):
         return out
 
 
-input_size = 12
+input_size = 14
 hidden_size = 100
 num_classes = 10
 
@@ -55,20 +57,21 @@ device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 model.to(device)
 
 accuracy_list = []
-for epoch in range(5000):
+for epoch in range(10000):
     inputs = X_train.to(device)
     labels = y_train.to(device)
 
     outputs = model(inputs)
     loss = criterion(outputs, labels)
-
+    if epoch == 2500:
+        optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
     optimizer.zero_grad()
     loss.backward()
     optimizer.step()
 
     if (epoch + 1) % 100 == 0:
         print('Epoch [{}/{}], Loss: {:.4f}'
-              .format(epoch + 1, 1000, loss.item()))
+              .format(epoch + 1, 10000, loss.item()))
 
     if (epoch + 1) % 10 == 0:
         # acc on genre 1
@@ -86,7 +89,7 @@ for epoch in range(5000):
         print('Accuracy of the network on the test images: {} %'.format(accuracy))
 
 # plot accuracy
-fig = px.line(x=range(0,5000,10), y=accuracy_list)
+fig = px.line(x=range(0,10000,10), y=accuracy_list)
 fig.show()
 
 # confusion matrix
@@ -96,10 +99,43 @@ with torch.no_grad():
     outputs = model(inputs)
     _, predicted = torch.max(outputs.data, 1)
     print(metrics.confusion_matrix(labels.cpu(), predicted.cpu()))
+    sns.heatmap(metrics.confusion_matrix(labels.cpu(), predicted.cpu()), annot=True, fmt='d')
+    plt.show()
+
+# to cpu
+outputs = outputs.cpu()
+predicted = predicted.cpu()
+fpr = dict()
+tpr = dict()
+roc_auc = dict()
+for i in range(9):
+    fpr[i], tpr[i], _ = metrics.roc_curve(y_test, outputs[:, i], pos_label=i)
+    roc_auc[i] = metrics.auc(fpr[i], tpr[i])
+
+print(roc_auc)
+
+# plot roc
+fig, ax = plt.subplots()
+for i in range(9):
+    ax = sns.lineplot(x=fpr[i], y=tpr[i], label='ROC curve (area = %0.2f)' % roc_auc[i])
+ax.plot([0, 1], [0, 1], 'k--')
+ax.set_xlim([0.0, 1.0])
+ax.set_ylim([0.0, 1.05])
+ax.set_xlabel('False Positive Rate')
+ax.set_ylabel('True Positive Rate')
+ax.set_title('Receiver operating characteristic')
+ax.legend(loc="lower right")
+plt.show()
+
+# f1 score
+f1 = []
+for i in range(9):
+    f1.append(metrics.f1_score(y_test, predicted, average=None)[i])
+print(f1)
+
 
 # save model
-torch.save(model.state_dict(), 'model.ckpt')
-
+torch.save(model.state_dict(), 'model.pth')
 
 
 

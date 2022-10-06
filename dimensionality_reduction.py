@@ -58,8 +58,8 @@ pca_result['valence'] = df['valence']
 pca_result['danceability'] = df['danceability']
 pca_result['instrumentalness'] = df['instrumentalness']
 pca_result['popularity'] = df['popularity']
-
-
+pca_result['artist_name'] = df['artist_name']
+pca_result['track_name'] = df['track_name']
 
 conn = sqlite3.connect('musicData.db')
 c = conn.cursor()

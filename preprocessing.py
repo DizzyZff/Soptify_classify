@@ -1,6 +1,10 @@
 import pandas as pd
 import numpy as np
 import sqlite3
+import nltk
+from nltk.corpus import stopwords
+from nltk.tokenize import word_tokenize
+from sklearn.feature_extraction.text import TfidfVectorizer
 
 #
 data_path = 'musicData.db'
@@ -9,10 +13,14 @@ c = conn.cursor()
 df = pd.read_sql_query("SELECT * FROM musicData", conn)
 conn.close()
 print("Finish Loading")
-
+df = df.dropna()
 print(df.head())
 print(df.info())
 print(df.describe())
+
+# duplicate
+duplicate = df["instance_id"].duplicated()
+print(duplicate.sum())
 
 # check missing value
 missing_count = df.isnull().sum()
@@ -40,24 +48,37 @@ key_dict = dict(zip(key, key_freq))
 df['key'] = df['key'].map(key_dict)
 
 # music genre to numeric labels
+# change hiphop to hip-hop/rap
+df['music_genre'] = df['music_genre'].replace('Hip-Hop', 'Hip-Hop/Rap')
+df['music_genre'] = df['music_genre'].replace('Rap', 'Hip-Hop/Rap')
+
 music_genre = df['music_genre'].unique()
+print(music_genre)
 music_genre_dict = dict(zip(music_genre, range(len(music_genre))))
 df['music_genre'] = df['music_genre'].map(music_genre_dict)
 
 # TEMPO to numeric
 df['tempo'] = df['tempo'].astype(float)
 
-print(df.head())
-print(df.info())
-print(df.describe())
-print(df['tempo'].describe())
+# name feature
+artist_name = df['artist_name']
+print(artist_name, len(artist_name))
+track_name = df['track_name']
+print(track_name, len(track_name))
+# name to length
+artist_name = [len(i) for i in artist_name]
+track_name = [len(i) for i in track_name]
+df['artist_name'] = artist_name
+df['track_name'] = track_name
 
 # to sql
+df = df.drop(['instance_id'], axis=1)
+df = df.drop(['obtained_date'], axis=1)
 conn = sqlite3.connect('musicData.db')
 c = conn.cursor()
 df.to_sql('musicData_clean', conn, if_exists='replace', index=False)
 conn.commit()
 conn.close()
 
-# to csv
-df.to_csv('musicData_clean.csv', index=False)
+# f1
+

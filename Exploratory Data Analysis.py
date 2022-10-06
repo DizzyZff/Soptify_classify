@@ -38,9 +38,8 @@ fig.update_layout(title='Correlation Matrix', xaxis_title='Features', yaxis_titl
                   margin=dict(r=0, l=0, b=0, t=0))
 fig.show()
 
-df = df.drop(['artist_name', 'track_name'], axis=1)
-df = df.drop(['instance_id'], axis=1)
-df = df.drop(['obtained_date'], axis=1)
+
+
 cat_df = df[['music_genre', 'mode_Minor', 'mode_Major', 'key']]  # categorical features
 num_df = df.drop(['music_genre', 'mode_Minor', 'mode_Major', 'key'], axis=1)  # numerical features
 
