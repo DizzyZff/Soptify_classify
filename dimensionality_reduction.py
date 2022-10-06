@@ -2,10 +2,6 @@ import pandas as pd
 import sqlite3
 from sklearn.decomposition import PCA
 import plotly.express as px
-import chart_studio
-
-
-chart_studio.tools.set_credentials_file(username='dizzyZff', api_key='EjdsWz3p1z69ibr3NaLb')
 # load from db
 data_path = 'musicData.db'
 conn = sqlite3.connect(data_path)
@@ -21,8 +17,8 @@ plt = px.imshow(corr, labels=dict(x="Features", y="Features", color="Correlation
                 color_continuous_scale=px.colors.sequential.Cividis_r)
 # colorscale = [[0, 'rgb(84, 84, 84)'], [1, 'rgb(230, 230, 218)']]
 plt.update_layout(
-    plot_bgcolor='rgb(230, 226, 218)',
-    paper_bgcolor='rgb(230, 226, 218)',
+    plot_bgcolor='rgb(234, 230, 222)',
+    paper_bgcolor='rgb(234, 230, 222)',
     font_color='rgb(0, 0, 0)',
     xaxis_showgrid=False,
     yaxis_showgrid=False,
@@ -31,7 +27,7 @@ plt.update_layout(
     margin=dict(r=20, l=10, b=10, t=10)
 )
 plt.show()
-plt.write_html("corr.html")
+#high quality image
 
 print(df.head())
 dropped_df = df.drop(['music_genre'], axis=1)
@@ -64,7 +60,7 @@ pca_result['music_genre'] = pca_result['music_genre'].astype('category')
 
 # plot
 fig = px.scatter_3d(pca_result, x='pca1', y='pca2', z='pca3', color='music_genre')
-background_color = 'rgb(230, 226, 218)'
+background_color = 'rgb(234, 230, 222)'
 fig.update_layout(scene=dict(
     xaxis=dict(
         backgroundcolor=background_color,
