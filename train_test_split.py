@@ -6,7 +6,7 @@ from sklearn.model_selection import train_test_split
 data_path = 'musicData.db'
 conn = sqlite3.connect(data_path)
 c = conn.cursor()
-df = pd.read_sql_query("SELECT * FROM musicData_pca", conn)
+df = pd.read_sql_query("SELECT * FROM musicData_pre", conn)
 conn.close()
 print("Finish Loading")
 

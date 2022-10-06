@@ -3,7 +3,7 @@ import sqlite3
 import plotly.express as px
 import seaborn as sns
 import matplotlib.pyplot as plt
-sns.set(rc={'axes.facecolor':'#e6e2da', 'figure.facecolor':'#e6e2da'})
+sns.set(rc={'axes.facecolor':'#eae6dd', 'figure.facecolor':'#eae6dd'})
 # load from db
 
 data_path = 'musicData.db'
@@ -18,11 +18,11 @@ num_df = df.drop(['mode_Major','mode_Minor', 'music_genre','key'], axis=1)
 print(cat_df.head(), num_df.head())
 
 # pairplot
-"""background_color = "#e6e2da"
+background_color = "#e6e2da"
 fig = sns.pairplot(num_df, plot_kws={'alpha': 0.6, 's': 3, 'edgecolor': '#545454'})
 fig.fig.set_facecolor(background_color)
 plt.show()
-fig.savefig('pairplot.png')"""
+fig.savefig('pairplot.png')
 
 conn = sqlite3.connect(data_path)
 c = conn.cursor()
@@ -31,7 +31,7 @@ conn.close()
 print("Finish Loading")
 
 """cat_df = df_pca[['mode_Major','mode_Minor', 'music_genre', 'key']]"""
-num_df = df_pca.drop(['music_genre','key'], axis=1)
+num_df = df_pca.drop(['music_genre','key', 'mode_Major', 'mode_Minor'], axis=1)
 print(cat_df.head(), num_df.head())
 
 # pairplot

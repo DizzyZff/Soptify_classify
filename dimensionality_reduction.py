@@ -58,7 +58,6 @@ df = df.drop(['energy', 'loudness', 'acousticness'], axis=1)
 df = df.drop(['artist_name','track_name'], axis=1)
 df = df.drop(['instance_id'], axis=1)
 df = df.drop(['obtained_date'], axis=1)
-df = df.drop(['mode_Minor', 'mode_Major'], axis=1)
 
 conn = sqlite3.connect(data_path)
 c = conn.cursor()
@@ -66,7 +65,16 @@ df.to_sql('musicData_pca', conn, if_exists='replace', index=False)
 conn.close()
 print("Finish Saving")
 
+new_df = df.drop(['pca1', 'pca2'], axis=1)
+new_df['energy'] = dropped_df['energy']
+new_df['loudness'] = dropped_df['loudness']
+new_df['acousticness'] = dropped_df['acousticness']
 
+conn = sqlite3.connect(data_path)
+c = conn.cursor()
+new_df.to_sql('musicData_pre', conn, if_exists='replace', index=False)
+conn.close()
+print("Finish Saving")
 
 
 # plot

@@ -36,7 +36,7 @@ class NeuralNet(torch.nn.Module):
         return out
 
 
-input_size = 11
+input_size = 14
 hidden_size = 300
 num_classes = 10
 
