@@ -53,10 +53,12 @@ pca_result = pca.transform(new_df)
 print(pca.explained_variance_ratio_, "sum:", sum(pca.explained_variance_ratio_))
 pca_result = pd.DataFrame(pca_result, columns=['pca1', 'pca2'])
 df['pca1'] = pca_result['pca1']
+df['pca2'] = pca_result['pca2']
 df = df.drop(['energy', 'loudness', 'acousticness'], axis=1)
 df = df.drop(['artist_name','track_name'], axis=1)
 df = df.drop(['instance_id'], axis=1)
 df = df.drop(['obtained_date'], axis=1)
+df = df.drop(['mode_Minor', 'mode_Major'], axis=1)
 
 conn = sqlite3.connect(data_path)
 c = conn.cursor()
