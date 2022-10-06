@@ -14,12 +14,12 @@ conn.close()
 print("Finish Loading")
 
 cat_df = df[['mode_Major','mode_Minor', 'music_genre', 'key']]
-num_df = df.drop(['mode_Major','mode_Minor', 'key'], axis=1)
+num_df = df.drop(['mode_Major','mode_Minor', 'music_genre','key'], axis=1)
 print(cat_df.head(), num_df.head())
 
 # pairplot
 background_color = "#e6e2da"
-fig = sns.pairplot(num_df, plot_kws={'alpha': 0.6, 's': 3, 'edgecolor': '#545454'}, hue='music_genre')
+fig = sns.pairplot(num_df, plot_kws={'alpha': 0.6, 's': 3, 'edgecolor': '#545454'})
 fig.fig.set_facecolor(background_color)
 plt.show()
 fig.savefig('pairplot.png')
