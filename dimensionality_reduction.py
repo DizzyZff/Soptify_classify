@@ -26,6 +26,7 @@ plt.update_layout(
     yaxis_zeroline=False,
     margin=dict(r=20, l=10, b=10, t=10)
 )
+
 plt.show()
 #high quality image
 
