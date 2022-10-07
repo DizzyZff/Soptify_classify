@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="DataSourceManagerImpl" format="xml" multifile-model="true">
-    <data-source source="LOCAL" name="musicData" uuid="159b7c43-869e-43b2-ac69-56a9a1dc6033">
+    <data-source source="LOCAL" name="musicData" uuid="ab7c09be-17de-40b6-9971-f1102653ded1">
       <driver-ref>sqlite.xerial</driver-ref>
       <synchronize>true</synchronize>
       <jdbc-driver>org.sqlite.JDBC</jdbc-driver>
-      <jdbc-url>jdbc:sqlite:C:\Users\91213\PycharmProjects\classify\musicData.db</jdbc-url>
+      <jdbc-url>jdbc:sqlite:C:\Users\91213\PycharmProjects\classify\db\musicData.db</jdbc-url>
       <working-dir>$ProjectFileDir$</working-dir>
       <libraries>
         <library>
