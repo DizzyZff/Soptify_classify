@@ -26,18 +26,21 @@ y_test = y_test.astype('int')
 
 # ,'mode_Major','mode_Minor'
 
-# multiclass classification neural network
+# multiclass classification neural network 2 hidden layers
 class NeuralNet(torch.nn.Module):
     def __init__(self, input_size, hidden_size, num_classes):
         super(NeuralNet, self).__init__()
         self.fc1 = torch.nn.Linear(input_size, hidden_size)
         self.relu = torch.nn.ReLU()
-        self.fc2 = torch.nn.Linear(hidden_size, num_classes)
+        self.fc2 = torch.nn.Linear(hidden_size, hidden_size)
+        self.fc3 = torch.nn.Linear(hidden_size, num_classes)
 
     def forward(self, x):
         out = self.fc1(x)
         out = self.relu(out)
         out = self.fc2(out)
+        out = self.relu(out)
+        out = self.fc3(out)
         return out
 
 

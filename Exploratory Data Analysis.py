@@ -22,7 +22,16 @@ missing_rate = round(missing_count / value_count * 100, 2)
 missing_df = pd.DataFrame({'missing_count': missing_count, 'missing_rate': missing_rate})
 print(missing_df)
 
-# plot missing rate
+sns = sns.barplot(x=missing_df.index, y='missing_rate', data=missing_df, palette='gray')
+sns.set_xticklabels(sns.get_xticklabels(), rotation=90)
+plt.show()
+
+
+
+
+
+
+"""# plot missing rate
 fig = px.bar(missing_df, x=missing_df.index, y='missing_rate', color='missing_rate', color_continuous_scale='Gray')
 fig.update_layout(title='Missing Rate', xaxis_title='Features', yaxis_title='Missing Rate (%)',
                   plot_bgcolor='#eae6dd', paper_bgcolor='#eae6dd', font_color='#000000',
@@ -68,3 +77,5 @@ c = conn.cursor()
 df.to_sql('musicData_eda', conn, if_exists='replace', index=False)
 conn.commit()
 conn.close()
+"""
+
