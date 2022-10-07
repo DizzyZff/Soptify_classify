@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 sns.set(rc={'axes.facecolor': '#eae6dd', 'figure.facecolor': '#eae6dd'})
 # load from db
 
-data_path = 'musicData.db'
+data_path = './db/musicData.db'
 conn = sqlite3.connect(data_path)
 c = conn.cursor()
 df = pd.read_sql_query("SELECT * FROM musicData_normal", conn)

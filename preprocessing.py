@@ -7,7 +7,7 @@ from nltk.tokenize import word_tokenize
 from sklearn.feature_extraction.text import TfidfVectorizer
 
 #
-data_path = 'musicData.db'
+data_path = './db/musicData.db'
 conn = sqlite3.connect(data_path)
 c = conn.cursor()
 df = pd.read_sql_query("SELECT * FROM musicData", conn)
@@ -51,6 +51,7 @@ df['key'] = df['key'].map(key_dict)
 # change hiphop to hip-hop/rap
 df['music_genre'] = df['music_genre'].replace('Hip-Hop', 'Hip-Hop/Rap')
 df['music_genre'] = df['music_genre'].replace('Rap', 'Hip-Hop/Rap')
+df['music_genre'] = df['music_genre'].replace('Alternative', 'Rock')
 
 music_genre = df['music_genre'].unique()
 print(music_genre)

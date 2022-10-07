@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 import sqlite3
 
-data_path = 'musicData.db'
+data_path = './db/musicData.db'
 conn = sqlite3.connect(data_path)
 c = conn.cursor()
 df = pd.read_sql_query("SELECT * FROM musicData_clean", conn)

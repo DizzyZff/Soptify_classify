@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 from sklearn import metrics
 sns.set(rc={'axes.facecolor': '#eae6dd', 'figure.facecolor': '#eae6dd'})
 
-data_path = 'musicData.db'
+data_path = './db/musicData.db'
 conn = sqlite3.connect(data_path)
 c = conn.cursor()
 train = pd.read_sql_query("SELECT * FROM train", conn)
@@ -108,7 +108,7 @@ predicted = predicted.cpu()
 fpr = dict()
 tpr = dict()
 roc_auc = dict()
-for i in range(9):
+for i in range(8):
     fpr[i], tpr[i], _ = metrics.roc_curve(y_test, outputs[:, i], pos_label=i)
     roc_auc[i] = metrics.auc(fpr[i], tpr[i])
 
@@ -116,7 +116,7 @@ print(roc_auc)
 
 # plot roc
 fig, ax = plt.subplots()
-for i in range(9):
+for i in range(8):
     ax = sns.lineplot(x=fpr[i], y=tpr[i], label='ROC curve (area = %0.2f)' % roc_auc[i])
 ax.plot([0, 1], [0, 1], 'k--')
 ax.set_xlim([0.0, 1.0])
@@ -129,7 +129,7 @@ plt.show()
 
 # f1 score
 f1 = []
-for i in range(9):
+for i in range(8):
     f1.append(metrics.f1_score(y_test, predicted, average=None)[i])
 print(f1)
 

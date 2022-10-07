@@ -4,14 +4,12 @@ import sqlite3
 import seaborn as sns
 import matplotlib.pyplot as plt
 from sklearn.decomposition import PCA
-import plotly.express as px
-# load from db
 from sklearn.impute import SimpleImputer
 
-data_path = 'musicData.db'
+data_path = './db/musicData.db'
 conn = sqlite3.connect(data_path)
 c = conn.cursor()
-df = pd.read_sql_query("SELECT * FROM musicData_eda", conn)
+df = pd.read_sql_query("SELECT * FROM musicData_normal", conn)
 conn.close()
 print("Finish Loading")
 

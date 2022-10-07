@@ -3,7 +3,7 @@ import sqlite3
 from sklearn.model_selection import train_test_split
 
 #load from db
-data_path = 'musicData.db'
+data_path = './db/musicData.db'
 conn = sqlite3.connect(data_path)
 c = conn.cursor()
 df = pd.read_sql_query("SELECT * FROM musicData_pca", conn)
@@ -16,7 +16,11 @@ genre_list = genre_list.tolist()
 
 datasets = []
 for genre in genre_list:
-    datasets.append(df[df['music_genre'] == genre])
+    if genre in [3,5]:
+        sample = df[df['music_genre'] == genre].sample(n=5000, random_state=1)
+    else:
+        sample = df[df['music_genre'] == genre].sample(n=5000, random_state=1)
+    datasets.append(sample)
 
 train_datasets = []
 test_datasets = []
