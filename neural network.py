@@ -5,6 +5,7 @@ import torch
 import seaborn as sns
 import matplotlib.pyplot as plt
 from sklearn import metrics
+
 sns.set(rc={'axes.facecolor': '#eae6dd', 'figure.facecolor': '#eae6dd'})
 
 data_path = './db/musicData.db'
@@ -21,6 +22,8 @@ y_train = y_train.astype('int')
 X_test = test.drop(['music_genre'], axis=1)
 y_test = test['music_genre']
 y_test = y_test.astype('int')
+
+
 # ,'mode_Major','mode_Minor'
 
 # multiclass classification neural network
@@ -89,7 +92,7 @@ for epoch in range(10000):
         print('Accuracy of the network on the test images: {} %'.format(accuracy))
 
 # plot accuracy
-fig = px.line(x=range(0,10000,10), y=accuracy_list)
+fig = px.line(x=range(0, 10000, 10), y=accuracy_list)
 fig.show()
 
 # confusion matrix
@@ -133,13 +136,5 @@ for i in range(8):
     f1.append(metrics.f1_score(y_test, predicted, average=None)[i])
 print(f1)
 
-
 # save model
 torch.save(model.state_dict(), 'model.pth')
-
-
-
-
-
-
-

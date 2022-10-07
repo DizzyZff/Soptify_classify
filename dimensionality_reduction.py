@@ -61,13 +61,6 @@ pca_result['track_name'] = df['track_name']
 
 conn = sqlite3.connect('musicData.db')
 c = conn.cursor()
-pca_result.to_sql('musicData_pca', conn, if_exists='replace', index = False)
+pca_result.to_sql('musicData_pca', conn, if_exists='replace', index=False)
 conn.commit()
 conn.close()
-
-
-
-
-
-
-

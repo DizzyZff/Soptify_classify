@@ -1,6 +1,5 @@
-import pandas as pd
-import numpy as np
 import sqlite3
+import pandas as pd
 
 data_path = './db/musicData.db'
 conn = sqlite3.connect(data_path)
@@ -26,7 +25,6 @@ df['popularity'] = (df['popularity'] - df['popularity'].mean()) / df['popularity
 # to sql
 conn = sqlite3.connect('musicData.db')
 c = conn.cursor()
-df.to_sql('musicData_normal', conn, if_exists='replace', index = False)
+df.to_sql('musicData_normal', conn, if_exists='replace', index=False)
 conn.commit()
 conn.close()
-

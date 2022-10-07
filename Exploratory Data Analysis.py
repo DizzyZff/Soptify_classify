@@ -38,8 +38,6 @@ fig.update_layout(title='Correlation Matrix', xaxis_title='Features', yaxis_titl
                   margin=dict(r=0, l=0, b=0, t=0))
 fig.show()
 
-
-
 cat_df = df[['music_genre', 'mode_Minor', 'mode_Major', 'key']]  # categorical features
 num_df = df.drop(['music_genre', 'mode_Minor', 'mode_Major', 'key'], axis=1)  # numerical features
 
@@ -70,4 +68,3 @@ c = conn.cursor()
 df.to_sql('musicData_eda', conn, if_exists='replace', index=False)
 conn.commit()
 conn.close()
-
